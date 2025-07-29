@@ -4,7 +4,8 @@
 <head>
 </head>
 <body>
-  <h1>Analyzing the Number of Different Types of Arm Injuries over the Course of the 2024 MLB Season</h1>
+  <h1>Analyzing Different Arm Injuries over the Course of a Baseball Season</h1>
+  <h3> Below is a breakdown of the trends of different types of arm injuries with respect to each month for the entire 2024 MLB season. </h3>
   <ul>
     <li><a href="index.html">Revert</a></li>
     <li><a href="slide1.html">Interval 1: Preseason</a></li>
@@ -79,10 +80,6 @@ series.forEach((s, i) => {
     var lightColorDates = s.values.filter(d => ((d.month <= startMonth) || (d.month >= endMonth)));
     var line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count));
 
-    console.log(highlightColorDates);
-    console.log(lightColorDates);
-
-
     svg.append("path")
       .datum(highlightColorDates)
       .attr("fill", "none")
@@ -94,7 +91,7 @@ series.forEach((s, i) => {
       .datum(lightColorDates)
       .attr("fill", "none")
       .attr("stroke", highlightColor.brighter(1))
-      .attr("stroke-width", 1)
+      .attr("stroke-width", .5)
       .attr("stroke-dasharray", "4 2")
       .attr("d", line);
 
