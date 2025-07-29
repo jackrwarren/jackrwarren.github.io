@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html>
+<body>
+<!-- <h1>Analyzing Pitcher Injury Rates per Month</h1>
+<p>Below we analyze given 2024 pitcher injuries with respect to the month.</p> -->
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style> circle {fill: lightblue; stroke: black;} </style>
+<body onload='init()'>
+<svg width=400 height=400>
+</svg>
+
+
+<script>
+async function init() {
+var height = 200;
+var margin = 50;
+var width = 400;
+
+const injuryType = ["elbow", "forearm", "shoulder", "total"];
+const allData = await d3.csv('https://jackrwarren.github.io/injuries.csv');
+const color = d3.scaleOrdinal(d3.schemeCategory10);
+const groupedData = {};
+
+allData.forEach(d => {
+    var type = String(d.injuryType);
+    if (type === "TJ") type = "elbow";
+    const month = +d.injuryMonth;
+    if (!groupedData[type]) groupedData[type] = {};
+    if (!groupedData["total"]) groupedData["total"] = {};
+    if (!groupedData[type][month]) groupedData[type][month] = 0;
+    if (!groupedData["total"][month]) groupedData["total"][month] = 0;
+    groupedData["total"][month] ++;
+    groupedData[type][month]++;
+})
+
+console.log(groupedData["total"]);
+
+console.log(groupedData);
+
+const series = Object.entries(groupedData).map(([type, monthMap]) => {
+    const values = Array.from({ length: 9 }, (_, i) => {
+      const month = i + 1;
+      return {
+        month,
+        count: monthMap[month] || 0
+      };
+    });
+    return { type, values };
+  });
+
+
+var xScale = d3.scaleLinear().domain([1,9]).range([0, width - margin]);
+var yScale = d3.scaleLinear().domain([0, 50]).range([height, 0]);
+const svg = d3.select('svg').attr("width", width + 2*margin).attr("height", height + 2*margin).append('g').attr('transform', "translate("+margin+","+margin+")");
+const line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count)).curve(d3.curveMonotoneX);
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
+
+series.forEach((s, i) => {
+    svg.append("path")
+      .datum(s.values)
+      .attr("fill", "none")
+      .attr("stroke", color(s.type))
+      .attr("stroke-width", 2)
+      .attr("d", line);
+  });
+
+svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(9).tickFormat(d => months[d-1]));
+svg.append("g").call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format("~s")));
+
+const legend = svg.append("g")
+  .attr("transform", "translate(" + (width - 50) + ", 0)"); 
+
+series.forEach((s, i) => {
+  const g = legend.append("g")
+    .attr("transform", `translate(0, ${i * 20})`);
+
+  g.append("rect")
+    .attr("width", 8)
+    .attr("height", 8)
+    .attr("fill", color(s.type));
+
+  g.append("text")
+    .attr("x", 18)
+    .attr("y", 7)
+    .text(s.type)
+    .style("font-size", "12px")
+});
+
+svg.append("text")
+  .attr("x", width / 2)
+  .attr("y", height + 40)
+  .attr("text-anchor", "middle")
+  .style("font-size", "14px")
+  .text("Month");
+
+svg.append("text")
+  .attr("transform", "rotate(-90)")
+  .attr("x", -height / 2)
+  .attr("y", -40)
+  .attr("text-anchor", "middle")
+  .style("font-size", "14px")
+  .text("Injury Count");
+
+
+}
+</script>
+
+</body>
+</html>
