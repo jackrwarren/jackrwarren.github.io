@@ -5,7 +5,7 @@
 <!-- <h1>Analyzing Pitcher Injury Rates per Month</h1>
 <p>Below we analyze given 2024 pitcher injuries with respect to the month.</p> -->
 
-<script src='https://d3js.org/d3.v5.min.js'></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 <style> circle {fill: lightblue; stroke: black;} </style>
 <body onload='init()'>
 <svg width=400 height=400>
@@ -14,35 +14,57 @@
 
 <script>
 async function init() {
-var xScale = d3.scaleLinear();
-var yScale = d3.scaleLinear().range([50, 0]);
-var margin = 50;
 var height = 200;
-const data = await d3.csv('https://jackrwarren.github.io/injuries.csv');
+var margin = 50;
+var width = 400;
 
-d3.select('svg').attr("width", 200).attr("height", 200)
-.append('g')
-.attr('transform', "translate("+margin+","+margin+")")
-.selectAll('circle')
-.data(data)
-.enter()
-.append('circle')
-.attr('cx', function(d) {return xScale(d.AverageCityMPG);})
-.attr('cy', function(d) {return yScale(d.AverageHighwayMPG);});
+const injuryType = ["elbow", "forearm", "shoulder", "TJ"];
+const allData = await d3.csv('https://jackrwarren.github.io/injuries.csv');
+const color = d3.scaleOrdinal(d3.schemeCategory10);
+const groupedData = {};
+
+allData.forEach(d => {
+    const type = d.injuryType;
+    const month = +d.injuryMonth;
+    console.log(type);
+    if (!groupedData[type]) groupedData[type] = {};
+    if (!groupedData[type][month]) groupedData[type][month] = 0;
+    groupedData[type][month]++;
+})
+
+console.log(groupedData);
+
+const series = Object.entries(groupedData).map(([type, monthMap]) => {
+    const values = Array.from({ length: 12 }, (_, i) => {
+      const month = i + 1;
+      return {
+        month,
+        count: monthMap[month] || 0
+      };
+    });
+    return { type, values };
+  });
 
 
-d3.select('svg')
-.append('g')
-.attr("transform", "translate("+margin+","+margin+")")
-.call(d3.axisLeft(yScale).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")))
-;
 
+var xScale = d3.scaleLinear().domain([1,12]).range([0, width - margin]);
+var yScale = d3.scaleLinear().domain([0, 50]).range([height, 0]);
+const svg = d3.select('svg').attr("width", width + 2*margin).attr("height", height + 2*margin).append('g').attr('transform', "translate("+margin+","+margin+")");
+const line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count))
 
-d3.select('svg')
-.append('g')
-.attr("transform", "translate("+margin+","+(height+margin)+")")
-.call(d3.axisBottom(xScale).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")));
+console.log(series);
 
+series.forEach((s, i) => {
+    svg.append("path")
+      .datum(s.values)
+      .attr("fill", "none")
+      .attr("stroke", color(s.type))
+      .attr("stroke-width", 2)
+      .attr("d", line);
+  });
+
+svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(12).tickFormat(d3.format("d")));
+svg.append("g").call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format("~s")));
 }
 </script>
 
