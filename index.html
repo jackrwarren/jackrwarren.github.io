@@ -3,24 +3,24 @@
 <head>
 </head>
 <body>
-  <h1>Analyzing Arm Injuries over the Course of a Professional Baseball Season</h1>
+  <h1>Analyzing the Number of Different Types of Arm Injuries over the Course of the 2024 MLB Season</h1>
   <ul>
     <li><a href="index.html">Revert</a></li>
-    <li><a href="slide1.html">Interval 0: Pre-Season</a></li>
+    <li><a href="slide1.html">Interval 1: Preseason</a></li>
   </ul>
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <style> circle {fill: lightblue; stroke: black;} </style>
 <body onload='init()'>
-<svg width=400 height=400>
+<svg width=600 height=600>
 </svg>
 
 
 <script>
 async function init() {
-var height = 200;
+var height = 600;
 var margin = 50;
-var width = 400;
+var width = 600;
 
 const injuryType = ["elbow", "forearm", "shoulder", "total"];
 const allData = await d3.csv('https://jackrwarren.github.io/injuries.csv');
@@ -39,9 +39,6 @@ allData.forEach(d => {
     groupedData[type][month]++;
 })
 
-console.log(groupedData["total"]);
-
-console.log(groupedData);
 
 const series = Object.entries(groupedData).map(([type, monthMap]) => {
     const values = Array.from({ length: 9 }, (_, i) => {
@@ -58,7 +55,7 @@ const series = Object.entries(groupedData).map(([type, monthMap]) => {
 var xScale = d3.scaleLinear().domain([1,9]).range([0, width - margin]);
 var yScale = d3.scaleLinear().domain([0, 50]).range([height, 0]);
 const svg = d3.select('svg').attr("width", width + 2*margin).attr("height", height + 2*margin).append('g').attr('transform', "translate("+margin+","+margin+")");
-const line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count)).curve(d3.curveMonotoneX);
+const line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count));
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
 
 series.forEach((s, i) => {

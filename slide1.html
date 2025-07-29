@@ -4,24 +4,27 @@
 <head>
 </head>
 <body>
-  <h1>Analyzing Arm Injuries over the Course of a Professional Baseball Season</h1>
+  <h1>Analyzing the Number of Different Types of Arm Injuries over the Course of the 2024 MLB Season</h1>
   <ul>
     <li><a href="index.html">Revert</a></li>
-    <li><a href="slide1.html">Interval 0: Pre-Season</a></li>
+    <li><a href="slide1.html">Interval 1: Preseason</a></li>
   </ul>
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://unpkg.com/d3-svg-annotation@2.5.1/d3-annotation.min.js"></script>
 <style> circle {fill: lightblue; stroke: black;} </style>
 <body onload='init()'>
-<svg width=400 height=400>
+<svg width=600 height=600>
 </svg>
 
 
 <script>
+
+
 async function init() {
-var height = 200;
+var height = 600;
 var margin = 50;
-var width = 400;
+var width = 600;
 
 const injuryType = ["elbow", "forearm", "shoulder", "total"];
 const allData = await d3.csv('https://jackrwarren.github.io/injuries.csv');
@@ -40,9 +43,6 @@ allData.forEach(d => {
     groupedData[type][month]++;
 })
 
-console.log(groupedData["total"]);
-
-console.log(groupedData);
 
 const series = Object.entries(groupedData).map(([type, monthMap]) => {
     const values = Array.from({ length: 9 }, (_, i) => {
@@ -59,16 +59,53 @@ const series = Object.entries(groupedData).map(([type, monthMap]) => {
 var xScale = d3.scaleLinear().domain([1,9]).range([0, width - margin]);
 var yScale = d3.scaleLinear().domain([0, 50]).range([height, 0]);
 const svg = d3.select('svg').attr("width", width + 2*margin).attr("height", height + 2*margin).append('g').attr('transform', "translate("+margin+","+margin+")");
-const line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count)).curve(d3.curveMonotoneX);
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
 
+// HIGHLIGHTED MONTHS
+let startMonth = 0, endMonth = 3;
+
+var shiftUp = 40;
+svg.append("rect")
+  .attr("x", xScale(1))               
+  .attr("y", -1 * shiftUp)                      
+  .attr("width", xScale(3) - xScale(1))
+  .attr("height", height + shiftUp)     
+  .attr("fill", "lightgray")
+  .attr("opacity", 0.3);
+
 series.forEach((s, i) => {
+    var highlightColor = d3.color(color(s.type));
+    var highlightColorDates = s.values.filter(d => (startMonth <= d.month && d.month <= endMonth));
+    var lightColorDates = s.values.filter(d => ((d.month <= startMonth) || (d.month >= endMonth)));
+    var line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count));
+
+    console.log(highlightColorDates);
+    console.log(lightColorDates);
+
+
     svg.append("path")
-      .datum(s.values)
+      .datum(highlightColorDates)
       .attr("fill", "none")
-      .attr("stroke", color(s.type))
-      .attr("stroke-width", 2)
+      .attr("stroke", highlightColor)
+      .attr("stroke-width", 6)
       .attr("d", line);
+
+    svg.append("path")
+      .datum(lightColorDates)
+      .attr("fill", "none")
+      .attr("stroke", highlightColor.brighter(1))
+      .attr("stroke-width", 1)
+      .attr("stroke-dasharray", "4 2")
+      .attr("d", line);
+
+    svg.selectAll(`dot-${s.key}`)
+      .data(highlightColorDates)
+      .enter().append("circle")
+      .attr("class", `dot dot-${s.key}`)
+      .attr("cx", d => xScale(d.month))
+      .attr("cy", d => yScale(d.count))
+      .attr("r", 6)
+      .attr("fill", highlightColor.formatRgb());
   });
 
 svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(9).tickFormat(d => months[d-1]));
@@ -108,6 +145,73 @@ svg.append("text")
   .style("font-size", "14px")
   .text("Injury Count");
 
+
+// TEXT
+svg.append("text")
+  .attr("x", 20)
+  .attr("y", -10)
+  .text("Preseason Months")
+  .attr("text-anchor", "start")
+  .style("font-size", "14px")
+  .style("font-weight", "bold");
+
+svg.append("text")
+  .attr("x", 20)
+  .attr("y", 10)
+  .text("Jan - Mar")
+  .attr("text-anchor", "start")
+  .style("font-size", "14px")
+  .style("font-weight", "bold");
+
+
+// LABELS
+
+const type = d3.annotationLabel;
+const annotations = [
+{
+  note: {
+    label: "The number of total injuries ramps up towards the start of the season, often due to the sudden increase in workload. As the regular season approaches, more and more throwing is done leading to higher chances of injury.",
+    bgPadding: 20,
+    title: "Total Injuries",
+    wrap: 200
+  },
+  data: {x: xScale(2.5), y: yScale(20)},
+  className: "show-bg",
+  dx: 60,
+  dy: -150,
+},
+{
+  note: {
+    label: "The spike in shoulder injuries in Feb can be explained by the exposure of shoulder-specific muscles (like the rotator cuff) in arm strength exercises done in early Spring Training to build conditioning and stamina.",
+    bgPadding: 20,
+    title: "Shoulder Injuries",
+    wrap: 200
+  },
+  data: {x: xScale(2), y: yScale(12)},
+  className: "show-bg",
+  dx: 299,
+  dy: -20
+}
+
+];
+
+const makeAnnotations = d3.annotation()
+  .type(type)
+  .accessors({x: d=> d.x, y: d=> d.y})
+  .annotations(annotations);
+
+svg.append("g").attr("class", "annotation-group").call(makeAnnotations);
+
+
+svg.selectAll(".annotation-note-title")
+  .style("fill", "black");
+
+svg.selectAll(".annotation-note-label")
+  .style("fill", "black");
+
+svg.selectAll(".annotation-connector path")
+  .style("stroke-width", "3px")
+  .style("fill", "black");
 
 }
 </script>
