@@ -3,108 +3,181 @@
 <head>
 </head>
 <body>
-  <h1>Analyzing Different Arm Injuries over the Course of a Baseball Season</h1>
-  <h3> Below is a breakdown of the trends of different types of arm injuries with respect to each month for the entire 2024 MLB season. </h3>
+  <h1>Analyzing Different Arm Injuries in Pitchers over the Course of a Baseball Season<br><br></h1>
   <ul>
-    <li><a href="index.html">Revert</a></li>
-    <li><a href="slide1.html">Interval 1: Preseason</a></li>
+    <a href="slide4.html"
+    style="position:absolute; 
+    text-decoration:none;
+    left:250px;
+    top:80px; 
+    font-weight:bold;
+    background-color: lightgrey;
+    border-radius:5px;
+    color: black;
+    border: 2px solid black;   
+    font-size:30px;" >&nbsp;&#8592;Back&nbsp;</a>
+    <a href="slide1.html"
+    style="position:absolute; 
+    text-decoration:none;
+    left:400px;
+    top:80px; 
+    font-weight:bold;
+    background-color: lightgrey;
+    border-radius:5px;
+    color: black;
+    border: 2px solid black;  
+    font-size:30px;">&nbsp;Next&#8594;&nbsp;</a>
   </ul>
 
+
+
 <script src="https://d3js.org/d3.v7.min.js"></script>
-<style> circle {fill: lightblue; stroke: black;} </style>
+<script src="https://unpkg.com/d3-svg-annotation@2.5.1/d3-annotation.min.js"></script>
+<style> circle {fill: grey; stroke: black;} </style>
 <body onload='init()'>
-<svg width=600 height=600>
+<svg width=800 height=600>
 </svg>
-
-
 <script>
+
+
 async function init() {
-var height = 600;
-var margin = 50;
-var width = 600;
+  var height = 550, width = 550;
+  var margin = 50;
 
-const injuryType = ["elbow", "forearm", "shoulder", "total"];
-const allData = await d3.csv('https://jackrwarren.github.io/injuries.csv');
-const color = d3.scaleOrdinal(d3.schemeCategory10);
-const countData = {};
+  const num_months = 9;
+  const injuryType = ["elbow", "forearm", "shoulder", "total"];
+  const allData = await d3.csv('https://jackrwarren.github.io/injuries.csv');
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+  var countData = {};
 
-allData.forEach(d => {
-    var type = String(d.injuryType);
-    if (type === "TJ") type = "elbow";
-    const month = +d.injuryMonth;
-    if (!countData[type]) countData[type] = {};
-    if (!countData["total"]) countData["total"] = {};
-    if (!countData[type][month]) countData[type][month] = 0;
-    if (!countData["total"][month]) countData["total"][month] = 0;
-    countData["total"][month] ++;
-    countData[type][month]++;
-})
+  allData.forEach(curr_data => {
+      let type = String(curr_data.injuryType), month = Number(curr_data.injuryMonth);
+      if (type === "TJ") type = "elbow";
+
+      if (!countData[type]) countData[type] = {};
+      if (!countData["total"]) countData["total"] = {};
+      if (!countData[type][month]) countData[type][month] = 0;
+      if (!countData["total"][month]) countData["total"][month] = 0;
+      countData[type][month]++;
+      countData["total"][month] ++;
+  })
 
 
-const series = Object.entries(countData).map(([type, monthMap]) => {
-    const values = Array.from({ length: 9 }, (_, i) => {
-      const month = i + 1;
-      return {
-        month,
-        count: monthMap[month] || 0
-      };
+  const data = Object.entries(countData).map(([type, monthMap]) => {
+      const values = Array.from({ length: num_months }, (d, i) => {
+        let month = i + 1;
+        return {
+          month,
+          count: monthMap[i+1] || 0
+        };
+      });
+      return {type, values};
     });
-    return { type, values };
+  
+  const svg = d3.select('svg')
+  .attr("width", width + 4 * margin)
+  .attr("height", height + 2 * margin)
+  .append('g')
+  .attr('transform', "translate("+margin+","+margin+")");
+  const xScale = d3.scaleLinear().domain([1,9]).range([0, width]);
+  const yScale = d3.scaleLinear().domain([0, 50]).range([height, 0]);
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
+
+  // HIGHLIGHTED MONTHS
+  var startMonth = -2, endMonth = -1;
+
+  svg.append("rect")
+    .attr("x", xScale(startMonth+1))             
+    .attr("y", -1 * 40)                      
+    .attr("width", xScale(endMonth) - xScale(startMonth+1))
+    .attr("height", height + 40)     
+    .attr("fill", "lightgray")
+    .attr("opacity", 0.3);
+
+  data.forEach((k, v) => {
+      var highlightColor = d3.color(color(k.type));
+      var highlightColorDates = k.values.filter(d => (startMonth <= d.month && d.month <= endMonth));
+      var lightColorDates = k.values.filter(d => (d.month <= startMonth || d.month >= endMonth));
+      var line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count));
+
+      svg.append("path")
+        .datum(highlightColorDates)
+        .attr("stroke", highlightColor)
+        .attr("stroke-width", 6)
+        .attr("d", line)
+        .attr("fill", "none");
+
+      svg.append("path")
+        .datum(lightColorDates)
+        .attr("stroke", highlightColor)
+        .attr("stroke-width", 3)
+        .attr("d", line)
+        .attr("fill", "none");
+      
+    });
+
+  svg.append("g").
+  attr("transform", `translate(0,${height})`)
+  .call(d3.axisBottom(xScale).ticks(num_months).tickFormat(d => months[d-1]));
+
+  svg.append("g")
+  .call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format("~s")));
+
+  var legend = svg.append("g")
+    .attr("transform", "translate(" +(width + 25)+ ", 0)"); 
+
+  data.forEach((k, v) => {
+    let curr_legend = legend.append("g")
+      .attr("transform", `translate(0, ${v * 20})`);
+
+    curr_legend.append("rect")
+      .attr("width", 8)
+      .attr("height", 8)
+      .attr("fill", color(k.type));
+
+    curr_legend.append("text")
+      .attr("x", 10)
+      .attr("y", 7)
+      .text(k.type + ' injuries')
+      .style("font-size", "12px")
   });
 
+  svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", height + 40)
+    .attr("text-anchor", "middle")
+    .style("font-size", "14px")
+    .text("Month");
 
-var xScale = d3.scaleLinear().domain([1,9]).range([0, width - margin]);
-var yScale = d3.scaleLinear().domain([0, 50]).range([height, 0]);
-const svg = d3.select('svg').attr("width", width + 2*margin).attr("height", height + 2*margin).append('g').attr('transform', "translate("+margin+","+margin+")");
-const line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count));
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
+  svg.append("text")
+    .attr("transform", "rotate(270)")
+    .attr("x", -1 * height / 2)
+    .attr("y", -40)
+    .attr("text-anchor", "middle")
+    .style("font-size", "14px")
+    .text("Injury Count");
 
-series.forEach((s, i) => {
-    svg.append("path")
-      .datum(s.values)
-      .attr("fill", "none")
-      .attr("stroke", color(s.type))
-      .attr("stroke-width", 2)
-      .attr("d", line);
-  });
 
-svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(9).tickFormat(d => months[d-1]));
-svg.append("g").call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format("~s")));
+  svg.append("text")
+    .attr("x", 300)
+    .attr("y", 0)
+    .attr("text-anchor", "middle")
+    .style("font-size", "18px")
+    .text("Below is a breakdown of the trends of different types of arm injuries");
 
-const legend = svg.append("g")
-  .attr("transform", "translate(" + (width - 50) + ", 0)"); 
+  svg.append("text")
+    .attr("x", 300)
+    .attr("y", 25)
+    .attr("text-anchor", "middle")
+    .style("font-size", "18px")
+    .text("in pitchers for each month across the 2024 MLB season.");
 
-series.forEach((s, i) => {
-  const g = legend.append("g")
-    .attr("transform", `translate(0, ${i * 20})`);
-
-  g.append("rect")
-    .attr("width", 8)
-    .attr("height", 8)
-    .attr("fill", color(s.type));
-
-  g.append("text")
-    .attr("x", 18)
-    .attr("y", 7)
-    .text(s.type)
-    .style("font-size", "12px")
-});
-
-svg.append("text")
-  .attr("x", width / 2)
-  .attr("y", height + 40)
-  .attr("text-anchor", "middle")
-  .style("font-size", "14px")
-  .text("Month");
-
-svg.append("text")
-  .attr("transform", "rotate(-90)")
-  .attr("x", -height / 2)
-  .attr("y", -40)
-  .attr("text-anchor", "middle")
-  .style("font-size", "14px")
-  .text("Injury Count");
-
+  svg.append("text")
+    .attr("x", 300)
+    .attr("y", 50)
+    .attr("text-anchor", "middle")
+    .style("font-size", "18px")
+    .text("Click the Back/Next buttons to analyze individual time intervals.");
 
 }
 </script>

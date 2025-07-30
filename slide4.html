@@ -6,7 +6,7 @@
 <body>
   <h1>Analyzing Different Arm Injuries in Pitchers over the Course of a Baseball Season<br><br></h1>
   <ul>
-    <a href="index.html"
+    <a href="slide3.html"
     style="position:absolute; 
     text-decoration:none;
     left:250px;
@@ -17,7 +17,7 @@
     color: black;
     border: 2px solid black;   
     font-size:30px;" >&nbsp;&#8592;Back&nbsp;</a>
-    <a href="slide2.html"
+    <a href="index.html"
     style="position:absolute; 
     text-decoration:none;
     left:400px;
@@ -85,12 +85,12 @@ async function init() {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
 
   // HIGHLIGHTED MONTHS
-  var startMonth = 0, endMonth = 3;
+  var startMonth = 7, endMonth = 9;
 
   svg.append("rect")
-    .attr("x", xScale(startMonth+1))             
+    .attr("x", xScale(startMonth))             
     .attr("y", -1 * 40)                      
-    .attr("width", xScale(endMonth) - xScale(startMonth+1))
+    .attr("width", xScale(endMonth) - xScale(startMonth))
     .attr("height", height + 40)     
     .attr("fill", "lightgray")
     .attr("opacity", 0.3);
@@ -98,7 +98,7 @@ async function init() {
   data.forEach((k, v) => {
       var highlightColor = d3.color(color(k.type));
       var highlightColorDates = k.values.filter(d => (startMonth <= d.month && d.month <= endMonth));
-      var lightColorDates = k.values.filter(d => (d.month <= startMonth || d.month >= endMonth));
+      var lightColorDates = k.values.filter(d => (d.month <= startMonth));
       var line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count));
 
       svg.append("path")
@@ -171,9 +171,9 @@ async function init() {
 
   // TEXT
   svg.append("text")
-    .attr("x", 15)
+    .attr("x", 425)
     .attr("y", -10)
-    .text("Preseason")
+    .text("End of Season")
     .style("font-size", "18px")
     .style("font-weight", "bold");
 
@@ -183,15 +183,15 @@ async function init() {
   const annotations = [
   {
     note: {
-      label: "1) Injuries ramp up towards the start of the season, due to the sudden increase in throwing, which leads to higher chances of injury. Specifically, the spike in shoulder injuries is caused by the over-exertion of muscles like the rotator cuff in early Spring Training from throwing exercises used to build conditioning and stamina.",
+      label: "4) Injuries spike again towards the end of the season due to the accumulation of stress placed on the arm over the entire year of pitching. Additionally, pitchers specifically are pushed to their physical limits, as even an extra win can be the difference in a division title or playoff opportunity.",
       bgPadding: 20,
       wrap: 200
     },
-    data: {x: xScale(2.75), y: yScale(20)},
+    data: {x: xScale(8), y: yScale(35)},
     className: "show-bg",
-    dx: 200,
-    dy: -55,
-  }
+    dx: -200,
+    dy: 100,
+  },
   ];
 
   const makeAnnotations = d3.annotation()
