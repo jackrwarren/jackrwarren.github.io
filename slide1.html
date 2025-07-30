@@ -10,9 +10,10 @@
     <a href="index.html"
     style="position:absolute; 
     text-decoration:none;
-    left:250px; top:120px; 
+    left:250px;
+    top:120px; 
     font-weight:bold;
-    background-color: #eee;
+    background-color: lightgrey;
     border-radius:5px;
     color: black;
     border: 2px solid black;   
@@ -20,9 +21,10 @@
     <a href="slide1.html"
     style="position:absolute; 
     text-decoration:none;
-    left:400px; top:120px; 
+    left:400px;
+    top:120px; 
     font-weight:bold;
-    background-color: #eee;
+    background-color: lightgrey;
     border-radius:5px;
     color: black;
     border: 2px solid black;  
@@ -33,7 +35,7 @@
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script src="https://unpkg.com/d3-svg-annotation@2.5.1/d3-annotation.min.js"></script>
-<style> circle {fill: lightblue; stroke: black;} </style>
+<style> circle {fill: grey; stroke: black;} </style>
 <body onload='init()'>
 <svg width=800 height=600>
 </svg>
@@ -50,38 +52,41 @@ async function init() {
   const color = d3.scaleOrdinal(d3.schemeCategory10);
   var countData = {};
 
-  allData.forEach(d => {
-      var type = String(d.injuryType);
-      var month = Number(d.injuryMonth);
+  allData.forEach(curr_data => {
+      let type = String(curr_data.injuryType), month = Number(curr_data.injuryMonth);
       if (type === "TJ") type = "elbow";
+
       if (!countData[type]) countData[type] = {};
       if (!countData["total"]) countData["total"] = {};
       if (!countData[type][month]) countData[type][month] = 0;
       if (!countData["total"][month]) countData["total"][month] = 0;
-      countData["total"][month] ++;
       countData[type][month]++;
+      countData["total"][month] ++;
   })
 
 
   const data = Object.entries(countData).map(([type, monthMap]) => {
       const values = Array.from({ length: num_months }, (d, i) => {
-        const month = i + 1;
+        let month = i + 1;
         return {
           month,
-          count: monthMap[month] || 0
+          count: monthMap[i+1] || 0
         };
       });
-      return { type, values };
+      return {type, values};
     });
-
-
-  var xScale = d3.scaleLinear().domain([1,9]).range([0, width]);
-  var yScale = d3.scaleLinear().domain([0, 50]).range([height, 0]);
-  const svg = d3.select('svg').attr("width", width + 4*margin).attr("height", height + 2*margin).append('g').attr('transform', "translate("+margin+","+margin+")");
+  
+  const svg = d3.select('svg')
+  .attr("width", width + 4 * margin)
+  .attr("height", height + 2 * margin)
+  .append('g')
+  .attr('transform', "translate("+margin+","+margin+")");
+  const xScale = d3.scaleLinear().domain([1,9]).range([0, width]);
+  const yScale = d3.scaleLinear().domain([0, 50]).range([height, 0]);
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
 
   // HIGHLIGHTED MONTHS
-  let startMonth = 0, endMonth = 3;
+  var startMonth = 0, endMonth = 3;
 
   svg.append("rect")
     .attr("x", xScale(startMonth+1))             
@@ -91,31 +96,31 @@ async function init() {
     .attr("fill", "lightgray")
     .attr("opacity", 0.3);
 
-  data.forEach((s, i) => {
-      var highlightColor = d3.color(color(s.type));
-      var highlightColorDates = s.values.filter(d => (startMonth <= d.month && d.month <= endMonth));
-      var lightColorDates = s.values.filter(d => ((d.month <= startMonth) || (d.month >= endMonth)));
+  data.forEach((k, v) => {
+      var highlightColor = d3.color(color(k.type));
+      var highlightColorDates = k.values.filter(d => (startMonth <= d.month && d.month <= endMonth));
+      var lightColorDates = k.values.filter(d => (d.month <= startMonth || d.month >= endMonth));
       var line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count));
 
       svg.append("path")
         .datum(highlightColorDates)
-        .attr("fill", "none")
         .attr("stroke", highlightColor)
         .attr("stroke-width", 6)
-        .attr("d", line);
+        .attr("d", line)
+        .attr("fill", "none");
 
       svg.append("path")
         .datum(lightColorDates)
-        .attr("fill", "none")
         .attr("stroke", highlightColor.brighter(1))
-        .attr("stroke-width", .5)
-        .attr("stroke-dasharray", "4 2")
-        .attr("d", line);
+        .attr("stroke-width", .75)
+        .attr("stroke-dasharray", "3 3")
+        .attr("d", line)
+        .attr("fill", "none");
 
-      var curr_points = svg.selectAll(`${s.key}`)
+      var curr_points = svg.selectAll("c")
         .data(highlightColorDates)
         .enter().append("circle")
-        .attr("class", `${s.key}`)
+        .attr("class", "c")
         .attr("cx", d => xScale(d.month))
         .attr("cy", d => yScale(d.count))
         .attr("r", 6)
@@ -123,25 +128,29 @@ async function init() {
       
     });
 
-  svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(num_months).tickFormat(d => months[d-1]));
-  svg.append("g").call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format("~s")));
+  svg.append("g").
+  attr("transform", `translate(0,${height})`)
+  .call(d3.axisBottom(xScale).ticks(num_months).tickFormat(d => months[d-1]));
 
-  const legend = svg.append("g")
-    .attr("transform", "translate(" + (width + 25) + ", 0)"); 
+  svg.append("g")
+  .call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format("~s")));
 
-  data.forEach((s, i) => {
+  var legend = svg.append("g")
+    .attr("transform", "translate(" +(width + 25)+ ", 0)"); 
+
+  data.forEach((k, v) => {
     let curr_legend = legend.append("g")
-      .attr("transform", `translate(0, ${i * 20})`);
+      .attr("transform", `translate(0, ${v * 20})`);
 
     curr_legend.append("rect")
       .attr("width", 8)
       .attr("height", 8)
-      .attr("fill", color(s.type));
+      .attr("fill", color(k.type));
 
     curr_legend.append("text")
       .attr("x", 10)
       .attr("y", 7)
-      .text(s.type + ' injuries')
+      .text(k.type + ' injuries')
       .style("font-size", "12px")
   });
 
@@ -153,7 +162,7 @@ async function init() {
     .text("Month");
 
   svg.append("text")
-    .attr("transform", "rotate(-90)")
+    .attr("transform", "rotate(270)")
     .attr("x", -1 * height / 2)
     .attr("y", -40)
     .attr("text-anchor", "middle")
@@ -192,10 +201,10 @@ async function init() {
       title: "Shoulder Injuries",
       wrap: 200
     },
-    data: {x: xScale(2), y: yScale(12)},
+    data: {x: xScale(2.2), y: yScale(12)},
     className: "show-bg",
-    dx: 299,
-    dy: -20
+    dx: 250,
+    dy: -20,
   }
 
   ];
@@ -206,16 +215,9 @@ async function init() {
     .annotations(annotations);
 
   svg.append("g").attr("class", "annotation-group").call(makeAnnotations);
-
-  svg.selectAll(".annotation-note-title")
-    .style("fill", "black");
-
-  svg.selectAll(".annotation-note-label")
-    .style("fill", "black");
-
-  svg.selectAll(".annotation-connector path")
-    .style("stroke-width", "3px")
-    .style("fill", "black");
+  svg.selectAll(".annotation-note-title").style("fill", "black");
+  svg.selectAll(".annotation-note-label").style("fill", "black");
+  svg.selectAll(".annotation-connector path").style("stroke-width", "3px").style("stroke", "black");
 
 }
 </script>

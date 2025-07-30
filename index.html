@@ -26,22 +26,22 @@ var width = 600;
 const injuryType = ["elbow", "forearm", "shoulder", "total"];
 const allData = await d3.csv('https://jackrwarren.github.io/injuries.csv');
 const color = d3.scaleOrdinal(d3.schemeCategory10);
-const groupedData = {};
+const countData = {};
 
 allData.forEach(d => {
     var type = String(d.injuryType);
     if (type === "TJ") type = "elbow";
     const month = +d.injuryMonth;
-    if (!groupedData[type]) groupedData[type] = {};
-    if (!groupedData["total"]) groupedData["total"] = {};
-    if (!groupedData[type][month]) groupedData[type][month] = 0;
-    if (!groupedData["total"][month]) groupedData["total"][month] = 0;
-    groupedData["total"][month] ++;
-    groupedData[type][month]++;
+    if (!countData[type]) countData[type] = {};
+    if (!countData["total"]) countData["total"] = {};
+    if (!countData[type][month]) countData[type][month] = 0;
+    if (!countData["total"][month]) countData["total"][month] = 0;
+    countData["total"][month] ++;
+    countData[type][month]++;
 })
 
 
-const series = Object.entries(groupedData).map(([type, monthMap]) => {
+const series = Object.entries(countData).map(([type, monthMap]) => {
     const values = Array.from({ length: 9 }, (_, i) => {
       const month = i + 1;
       return {
