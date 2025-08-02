@@ -102,80 +102,76 @@ async function init() {
       var line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count));
 
       svg.append("path")
-        .datum(highlightColorDates)
-        .attr("stroke", highlightColor)
-        .attr("stroke-width", 6)
-        .attr("d", line)
-        .attr("fill", "none");
+      .datum(highlightColorDates)
+      .attr("stroke", highlightColor)
+      .attr("stroke-width", 6)
+      .attr("d", line)
+      .attr("fill", "none");
 
       svg.append("path")
-        .datum(lightColorDates)
-        .attr("stroke", highlightColor.brighter(1))
-        .attr("stroke-width", .75)
-        .attr("stroke-dasharray", "3 3")
-        .attr("d", line)
-        .attr("fill", "none");
+      .datum(lightColorDates)
+      .attr("stroke", highlightColor.brighter(1))
+      .attr("stroke-width", .75)
+      .attr("stroke-dasharray", "3 3")
+      .attr("d", line)
+      .attr("fill", "none");
 
       var curr_points = svg.selectAll("c")
-        .data(highlightColorDates)
-        .enter().append("circle")
-        .attr("class", "c")
-        .attr("cx", d => xScale(d.month))
-        .attr("cy", d => yScale(d.count))
-        .attr("r", 6)
-        .attr("fill", highlightColor.formatRgb());
+      .data(highlightColorDates)
+      .enter().append("circle")
+      .attr("class", "c")
+      .attr("cx", d => xScale(d.month))
+      .attr("cy", d => yScale(d.count))
+      .attr("r", 6)
+      .attr("fill", highlightColor.formatRgb());
       
     });
 
-  svg.append("g").
-  attr("transform", `translate(0,${height})`)
+  svg.append("g").attr("transform", `translate(0,${height})`)
   .call(d3.axisBottom(xScale).ticks(num_months).tickFormat(d => months[d-1]));
 
-  svg.append("g")
-  .call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format("~s")));
+  svg.append("g").call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format("~s")));
 
-  var legend = svg.append("g")
-    .attr("transform", "translate(" +(width + 25)+ ", 0)"); 
+  var legend = svg.append("g").attr("transform", "translate(" +(width + 25)+ ", 0)"); 
 
   data.forEach((k, v) => {
-    let curr_legend = legend.append("g")
-      .attr("transform", `translate(0, ${v * 20})`);
+    let curr_legend = legend.append("g").attr("transform", `translate(0, ${v * 20})`);
 
     curr_legend.append("rect")
-      .attr("width", 8)
-      .attr("height", 8)
-      .attr("fill", color(k.type));
+    .attr("width", 8)
+    .attr("height", 8)
+    .attr("fill", color(k.type));
 
     curr_legend.append("text")
-      .attr("x", 10)
-      .attr("y", 7)
-      .text(k.type + ' injuries')
-      .style("font-size", "12px")
+    .attr("x", 10)
+    .attr("y", 7)
+    .text(k.type + ' injuries')
+    .style("font-size", "12px")
   });
 
   svg.append("text")
-    .attr("x", width / 2)
-    .attr("y", height + 40)
-    .attr("text-anchor", "middle")
-    .style("font-size", "14px")
-    .text("Month");
+  .attr("x", width / 2)
+  .attr("y", height + 40)
+  .attr("text-anchor", "middle")
+  .style("font-size", "14px")
+  .text("Month");
 
   svg.append("text")
-    .attr("transform", "rotate(270)")
-    .attr("x", -1 * height / 2)
-    .attr("y", -40)
-    .attr("text-anchor", "middle")
-    .style("font-size", "14px")
-    .text("Injury Count");
+  .attr("transform", "rotate(270)")
+  .attr("x", -1 * height / 2)
+  .attr("y", -40)
+  .attr("text-anchor", "middle")
+  .style("font-size", "14px")
+  .text("Injury Count");
 
 
   // TEXT
   svg.append("text")
-    .attr("x", 425)
-    .attr("y", -10)
-    .text("End of Season")
-    .style("font-size", "18px")
-    .style("font-weight", "bold");
+  .attr("x", 425)
+  .attr("y", -10)
+  .text("End of Season")
+  .style("font-size", "18px")
+  .style("font-weight", "bold");
 
   // LABELS
 
@@ -198,9 +194,9 @@ async function init() {
   ];
 
   const makeAnnotations = d3.annotation()
-    .type(type)
-    .accessors({x: d=> d.x, y: d=> d.y})
-    .annotations(annotations);
+  .type(type)
+  .accessors({x: d=> d.x, y: d=> d.y})
+  .annotations(annotations);
 
   svg.append("g").attr("class", "annotation-group").call(makeAnnotations);
   svg.selectAll(".annotation-note-title").style("fill", "black");
