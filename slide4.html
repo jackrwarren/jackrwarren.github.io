@@ -183,15 +183,18 @@ async function init() {
   const annotations = [
   {
     note: {
-      label: "4) Injuries spike again towards the end of the season due to the accumulation of stress placed on the arm over the entire year of pitching. Additionally, pitchers specifically are pushed to their physical limits, as even an extra win can be the difference in a division title or playoff opportunity.",
-      bgPadding: 20,
+      label: "4) Injuries spike towards season's end due to the accumulation of stress placed on the body and more pitchers being pushed to their physical limits, to help their team win in a division title or secure a playoff spot. This leads to...",
       wrap: 200
     },
-    data: {x: xScale(8), y: yScale(35)},
-    className: "show-bg",
-    dx: -200,
-    dy: 100,
+    data: {x: xScale(8), y: yScale(42)}, className: "show-bg", dx: -250, dy: 25,
   },
+  {
+    note: {
+      label: "a spike in shoulder injuries (again), due to torn rotator cuffs. Elbow injuries actually drop, since pitchers with any kind of elbow issues are shut down by their coaches from playing, leading to total less pitchers landing on the injured list.",
+      wrap: 200
+    },
+    data: {x: xScale(7.75), y: yScale(20)},dx: -200,dy: 15,
+  }
   ];
 
   const makeAnnotations = d3.annotation()

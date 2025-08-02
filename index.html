@@ -87,12 +87,12 @@ async function init() {
   var startMonth = -2, endMonth = -1;
 
   svg.append("rect")
-    .attr("x", xScale(startMonth+1))             
-    .attr("y", -1 * 40)                      
-    .attr("width", xScale(endMonth) - xScale(startMonth+1))
-    .attr("height", height + 40)     
-    .attr("fill", "lightgray")
-    .attr("opacity", 0.3);
+  .attr("x", xScale(startMonth+1))             
+  .attr("y", -1 * 40)                      
+  .attr("width", xScale(endMonth) - xScale(startMonth+1))
+  .attr("height", height + 40)     
+  .attr("fill", "lightgray")
+  .attr("opacity", 0.3);
 
   data.forEach((k, v) => {
       var highlightColor = d3.color(color(k.type));
@@ -101,18 +101,18 @@ async function init() {
       var line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count));
 
       svg.append("path")
-        .datum(highlightColorDates)
-        .attr("stroke", highlightColor)
-        .attr("stroke-width", 6)
-        .attr("d", line)
-        .attr("fill", "none");
+      .datum(highlightColorDates)
+      .attr("stroke", highlightColor)
+      .attr("stroke-width", 6)
+      .attr("d", line)
+      .attr("fill", "none");
 
       svg.append("path")
-        .datum(lightColorDates)
-        .attr("stroke", highlightColor)
-        .attr("stroke-width", 3)
-        .attr("d", line)
-        .attr("fill", "none");
+      .datum(lightColorDates)
+      .attr("stroke", highlightColor)
+      .attr("stroke-width", 3)
+      .attr("d", line)
+      .attr("fill", "none");
       
     });
 
@@ -143,41 +143,41 @@ async function init() {
   });
 
   svg.append("text")
-    .attr("x", width / 2)
-    .attr("y", height + 40)
-    .attr("text-anchor", "middle")
-    .style("font-size", "14px")
-    .text("Month");
+  .attr("x", width / 2)
+  .attr("y", height + 40)
+  .attr("text-anchor", "middle")
+  .style("font-size", "14px")
+  .text("Month");
 
   svg.append("text")
-    .attr("transform", "rotate(270)")
-    .attr("x", -1 * height / 2)
-    .attr("y", -40)
-    .attr("text-anchor", "middle")
-    .style("font-size", "14px")
-    .text("Injury Count");
+  .attr("transform", "rotate(270)")
+  .attr("x", -1 * height / 2)
+  .attr("y", -40)
+  .attr("text-anchor", "middle")
+  .style("font-size", "14px")
+  .text("Injury Count");
 
 
   svg.append("text")
-    .attr("x", 300)
-    .attr("y", 0)
-    .attr("text-anchor", "middle")
-    .style("font-size", "18px")
-    .text("Below is a breakdown of the trends of different types of arm injuries");
+  .attr("x", 300)
+  .attr("y", 0)
+  .attr("text-anchor", "middle")
+  .style("font-size", "18px")
+  .text("Below is a breakdown of the trends of different types of arm injuries");
 
   svg.append("text")
-    .attr("x", 300)
-    .attr("y", 25)
-    .attr("text-anchor", "middle")
-    .style("font-size", "18px")
-    .text("in pitchers for each month across the 2024 MLB season.");
+  .attr("x", 300)
+  .attr("y", 25)
+  .attr("text-anchor", "middle")
+  .style("font-size", "18px")
+  .text("in pitchers for each month across the 2024 MLB season.");
 
   svg.append("text")
-    .attr("x", 300)
-    .attr("y", 50)
-    .attr("text-anchor", "middle")
-    .style("font-size", "18px")
-    .text("Click the Back/Next buttons to analyze individual time intervals.");
+  .attr("x", 300)
+  .attr("y", 50)
+  .attr("text-anchor", "middle")
+  .style("font-size", "18px")
+  .text("Click the Back/Next buttons to analyze individual time intervals.");
 
 }
 </script>

@@ -80,6 +80,7 @@ async function init() {
   .attr("height", height + 2 * margin)
   .append('g')
   .attr('transform', "translate("+margin+","+margin+")");
+
   const xScale = d3.scaleLinear().domain([1,9]).range([0, width]);
   const yScale = d3.scaleLinear().domain([0, 50]).range([height, 0]);
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
@@ -88,12 +89,12 @@ async function init() {
   var startMonth = 0, endMonth = 3;
 
   svg.append("rect")
-    .attr("x", xScale(startMonth+1))             
-    .attr("y", -1 * 40)                      
-    .attr("width", xScale(endMonth) - xScale(startMonth+1))
-    .attr("height", height + 40)     
-    .attr("fill", "lightgray")
-    .attr("opacity", 0.3);
+  .attr("x", xScale(startMonth+1))             
+  .attr("y", -1 * 40)                      
+  .attr("width", xScale(endMonth) - xScale(startMonth+1))
+  .attr("height", height + 40)     
+  .attr("fill", "lightgray")
+  .attr("opacity", 0.3);
 
   data.forEach((k, v) => {
       var highlightColor = d3.color(color(k.type));
@@ -102,28 +103,28 @@ async function init() {
       var line = d3.line().x(d => xScale(d.month)).y(d => yScale(d.count));
 
       svg.append("path")
-        .datum(highlightColorDates)
-        .attr("stroke", highlightColor)
-        .attr("stroke-width", 6)
-        .attr("d", line)
-        .attr("fill", "none");
+      .datum(highlightColorDates)
+      .attr("stroke", highlightColor)
+      .attr("stroke-width", 6)
+      .attr("d", line)
+      .attr("fill", "none");
 
       svg.append("path")
-        .datum(lightColorDates)
-        .attr("stroke", highlightColor.brighter(1))
-        .attr("stroke-width", .75)
-        .attr("stroke-dasharray", "3 3")
-        .attr("d", line)
-        .attr("fill", "none");
+      .datum(lightColorDates)
+      .attr("stroke", highlightColor.brighter(1))
+      .attr("stroke-width", .75)
+      .attr("stroke-dasharray", "3 3")
+      .attr("d", line)
+      .attr("fill", "none");
 
       var curr_points = svg.selectAll("c")
-        .data(highlightColorDates)
-        .enter().append("circle")
-        .attr("class", "c")
-        .attr("cx", d => xScale(d.month))
-        .attr("cy", d => yScale(d.count))
-        .attr("r", 6)
-        .attr("fill", highlightColor.formatRgb());
+      .data(highlightColorDates)
+      .enter().append("circle")
+      .attr("class", "c")
+      .attr("cx", d => xScale(d.month))
+      .attr("cy", d => yScale(d.count))
+      .attr("r", 6)
+      .attr("fill", highlightColor.formatRgb());
       
     });
 
@@ -135,47 +136,47 @@ async function init() {
   .call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format("~s")));
 
   var legend = svg.append("g")
-    .attr("transform", "translate(" +(width + 25)+ ", 0)"); 
+  .attr("transform", "translate(" +(width + 25)+ ", 0)"); 
 
   data.forEach((k, v) => {
     let curr_legend = legend.append("g")
-      .attr("transform", `translate(0, ${v * 20})`);
+    .attr("transform", `translate(0, ${v * 20})`);
 
     curr_legend.append("rect")
-      .attr("width", 8)
-      .attr("height", 8)
-      .attr("fill", color(k.type));
+    .attr("width", 8)
+    .attr("height", 8)
+    .attr("fill", color(k.type));
 
     curr_legend.append("text")
-      .attr("x", 10)
-      .attr("y", 7)
-      .text(k.type + ' injuries')
-      .style("font-size", "12px")
+    .attr("x", 10)
+    .attr("y", 7)
+    .text(k.type + ' injuries')
+    .style("font-size", "12px")
   });
 
   svg.append("text")
-    .attr("x", width / 2)
-    .attr("y", height + 40)
-    .attr("text-anchor", "middle")
-    .style("font-size", "14px")
-    .text("Month");
+  .attr("x", width / 2)
+  .attr("y", height + 40)
+  .attr("text-anchor", "middle")
+  .style("font-size", "14px")
+  .text("Month");
 
   svg.append("text")
-    .attr("transform", "rotate(270)")
-    .attr("x", -1 * height / 2)
-    .attr("y", -40)
-    .attr("text-anchor", "middle")
-    .style("font-size", "14px")
-    .text("Injury Count");
+  .attr("transform", "rotate(270)")
+  .attr("x", -1 * height / 2)
+  .attr("y", -40)
+  .attr("text-anchor", "middle")
+  .style("font-size", "14px")
+  .text("Injury Count");
 
 
   // TEXT
   svg.append("text")
-    .attr("x", 15)
-    .attr("y", -10)
-    .text("Preseason")
-    .style("font-size", "18px")
-    .style("font-weight", "bold");
+  .attr("x", 15)
+  .attr("y", -10)
+  .text("Preseason")
+  .style("font-size", "18px")
+  .style("font-weight", "bold");
 
   // LABELS
 
@@ -183,14 +184,17 @@ async function init() {
   const annotations = [
   {
     note: {
-      label: "1) Injuries ramp up towards the start of the season, due to the sudden increase in throwing, which leads to higher chances of injury. Specifically, the spike in shoulder injuries is caused by the over-exertion of muscles like the rotator cuff in early Spring Training from throwing exercises used to build conditioning and stamina.",
-      bgPadding: 20,
+      label: "1) Injuries ramp up towards the start of the season, due to the sudden increase in throwing, which leads to higher chances of injury. This can be specifically attributed to...",
       wrap: 200
     },
-    data: {x: xScale(2.75), y: yScale(20)},
-    className: "show-bg",
-    dx: 200,
-    dy: -55,
+    data: {x: xScale(2.75), y: yScale(20)}, dx:170, dy:-95,
+  },
+  {
+    note: {
+      label: "a spike in shoulder injuries, caused by an over-exertion of muscles like the rotator cuff from the introduction of exercises for building conditioning and arm stamina.",
+      wrap: 200
+    },
+    data: {x: xScale(2.25), y: yScale(12)},dx:220, dy:-10,
   }
   ];
 
