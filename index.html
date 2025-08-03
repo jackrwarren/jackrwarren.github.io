@@ -116,34 +116,31 @@ async function init() {
       
     });
 
-  svg.append("g").
-  attr("transform", `translate(0,${height})`)
+  svg.append("g").attr("transform", `translate(0,${height})`)
   .call(d3.axisBottom(xScale).ticks(num_months).tickFormat(d => months[d-1]));
 
-  svg.append("g")
-  .call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format("~s")));
+  svg.append("g").call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format("~s")));
 
-  var legend = svg.append("g")
-    .attr("transform", "translate(" +(width + 25)+ ", 0)"); 
+  var legend = svg.append("g").attr("transform", "translate(" +(width + 25)+ ", 0)"); 
 
   data.forEach((k, v) => {
     let curr_legend = legend.append("g")
       .attr("transform", `translate(0, ${v * 20})`);
 
     curr_legend.append("rect")
-      .attr("width", 8)
-      .attr("height", 8)
-      .attr("fill", color(k.type));
+    .attr("width", 8)
+    .attr("height", 8)
+    .attr("fill", color(k.type));
 
     curr_legend.append("text")
-      .attr("x", 10)
-      .attr("y", 7)
-      .text(k.type + ' injuries')
-      .style("font-size", "12px")
+    .attr("x", 10)
+    .attr("y", 7)
+    .text(k.type + ' injuries')
+    .style("font-size", "12px")
   });
 
   svg.append("text")
-  .attr("x", width / 2)
+  .attr("x", width/2)
   .attr("y", height + 40)
   .attr("text-anchor", "middle")
   .style("font-size", "14px")

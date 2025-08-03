@@ -88,12 +88,12 @@ async function init() {
   var startMonth = 7, endMonth = 9;
 
   svg.append("rect")
-    .attr("x", xScale(startMonth))             
-    .attr("y", -1 * 40)                      
-    .attr("width", xScale(endMonth) - xScale(startMonth))
-    .attr("height", height + 40)     
-    .attr("fill", "lightgray")
-    .attr("opacity", 0.3);
+  .attr("x", xScale(startMonth))             
+  .attr("y", -1 * 40)                      
+  .attr("width", xScale(endMonth) - xScale(startMonth))
+  .attr("height", height + 40)     
+  .attr("fill", "lightgray")
+  .attr("opacity", 0.3);
 
   data.forEach((k, v) => {
       var highlightColor = d3.color(color(k.type));
@@ -150,7 +150,7 @@ async function init() {
   });
 
   svg.append("text")
-  .attr("x", width / 2)
+  .attr("x", width/2)
   .attr("y", height + 40)
   .attr("text-anchor", "middle")
   .style("font-size", "14px")
@@ -158,7 +158,7 @@ async function init() {
 
   svg.append("text")
   .attr("transform", "rotate(270)")
-  .attr("x", -1 * height / 2)
+  .attr("x", -1 * height/2)
   .attr("y", -40)
   .attr("text-anchor", "middle")
   .style("font-size", "14px")

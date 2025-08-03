@@ -88,12 +88,12 @@ async function init() {
   var startMonth = 5, endMonth = 7;
 
   svg.append("rect")
-    .attr("x", xScale(startMonth))             
-    .attr("y", -1 * 40)                      
-    .attr("width", xScale(endMonth) - xScale(startMonth))
-    .attr("height", height + 40)     
-    .attr("fill", "lightgray")
-    .attr("opacity", 0.3);
+  .attr("x", xScale(startMonth))             
+  .attr("y", -1 * 40)                      
+  .attr("width", xScale(endMonth) - xScale(startMonth))
+  .attr("height", height + 40)     
+  .attr("fill", "lightgray")
+  .attr("opacity", 0.3);
 
   data.forEach((k, v) => {
       var highlightColor = d3.color(color(k.type));
@@ -148,19 +148,19 @@ async function init() {
       .attr("transform", `translate(0, ${v * 20})`);
 
     curr_legend.append("rect")
-      .attr("width", 8)
-      .attr("height", 8)
-      .attr("fill", color(k.type));
+    .attr("width", 8)
+    .attr("height", 8)
+    .attr("fill", color(k.type));
 
     curr_legend.append("text")
-      .attr("x", 10)
-      .attr("y", 7)
-      .text(k.type + ' injuries')
-      .style("font-size", "12px")
+    .attr("x", 10)
+    .attr("y", 7)
+    .text(k.type + ' injuries')
+    .style("font-size", "12px")
   });
 
   svg.append("text")
-  .attr("x", width / 2)
+  .attr("x", width/2)
   .attr("y", height + 40)
   .attr("text-anchor", "middle")
   .style("font-size", "14px")
@@ -168,7 +168,7 @@ async function init() {
 
   svg.append("text")
   .attr("transform", "rotate(270)")
-  .attr("x", -1 * height / 2)
+  .attr("x", -1 * height/2)
   .attr("y", -40)
   .attr("text-anchor", "middle")
   .style("font-size", "14px")
